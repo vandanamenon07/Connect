@@ -731,30 +731,13 @@ export function Dashboard({
     <div className="grid-bg min-h-screen overflow-y-auto">
       {/* nav */}
       <header className="sticky top-0 z-30 border-b-4 border-ink bg-card">
-        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:px-5">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-5">
           <p className="truncate font-display text-lg font-bold sm:text-xl">
             LAR<span className="ml-1 text-lavender">Connect</span>
           </p>
-          <nav className="hidden xl:flex">
-            <div className="nb flex max-w-[min(100%,42rem)] items-center overflow-x-auto bg-background p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <div className="flex flex-nowrap items-center gap-2 whitespace-nowrap">
-                {MENU.map((m) => (
-                  <button
-                    key={m.key}
-                    onClick={() => go(m.key)}
-                    className={`nb nb-press px-3 py-2 text-sm font-bold ${
-                      view === m.key ? "bg-lavender text-primary-foreground" : "bg-background"
-                    }`}
-                  >
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </nav>
           <button
             onClick={() => setDrawer(true)}
-            className="nb nb-press shrink-0 bg-lavender px-4 py-2 text-sm font-bold text-primary-foreground xl:hidden"
+            className="nb nb-press shrink-0 bg-lavender px-4 py-2 text-sm font-bold text-primary-foreground"
           >
             Menu
           </button>
@@ -815,7 +798,7 @@ export function Dashboard({
       {/* slide-out drawer */}
       {drawer && (
         <div
-          className="fixed inset-0 z-40 xl:hidden"
+          className="fixed inset-0 z-40"
           style={{ backgroundColor: "color-mix(in oklab, black 45%, transparent)" }}
           onClick={() => setDrawer(false)}
         >
