@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Badge, NBButton, type Role } from "./flow";
 
 type MenuKey =
@@ -11,6 +11,7 @@ type MenuKey =
   | "language"
   | "tutor"
   | "leaderboard"
+  | "guide"
   | "offline"
   | "community"
   | "impact"
@@ -26,6 +27,7 @@ const MENU: { key: MenuKey; label: string }[] = [
   { key: "language", label: "Language" },
   { key: "tutor", label: "AI Tutor" },
   { key: "leaderboard", label: "Leaderboard" },
+  { key: "guide", label: "User Guide" },
   { key: "offline", label: "Offline Downloads" },
   { key: "community", label: "Community" },
   { key: "impact", label: "Impact" },
@@ -42,6 +44,7 @@ const TITLES: Record<MenuKey, string> = {
   language: "Language",
   tutor: "AI Tutor Session",
   leaderboard: "Leaderboard",
+  guide: "User Guide",
   offline: "Offline Downloads",
   community: "Community Wall",
   impact: "Our Impact",
@@ -215,6 +218,38 @@ function TeacherLeaderboard() {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function UserGuidePanel({ isStudent }: { isStudent: boolean }) {
+  const steps = isStudent
+    ? [
+        { title: "Join live classes", meta: "Open the Live Classes panel and join sessions built for low bandwidth." },
+        { title: "Find mentors", meta: "Browse the mentor network and connect with guidance from nearby educators." },
+        { title: "Download resources", meta: "Save notes, worksheets and videos for offline study anytime." },
+        { title: "Earn LAR credits", meta: "Attend classes, upload work and keep your streak alive to rank higher." },
+        { title: "Use the AI tutor", meta: "Ask questions or switch to offline RAG mode for answer support." },
+        { title: "Check your rank", meta: "Visit the leaderboard to see how your credits compare with others." },
+        { title: "Change language", meta: "Switch the interface to a language that feels more comfortable for you." },
+      ]
+    : [
+        { title: "Host live classes", meta: "Publish sessions and welcome learners to join from any device." },
+        { title: "Upload content", meta: "Share lessons, worksheets, and videos for your students and community." },
+        { title: "Mentor learners", meta: "Support students through the mentor network and community channels." },
+        { title: "Track your impact", meta: "Watch your leaderboard rank and engagement grow over time." },
+        { title: "Use the AI tutor", meta: "Support learners with instant explanations and practice prompts." },
+        { title: "Change language", meta: "Switch the interface language so your dashboard feels familiar." },
+      ];
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        {isStudent
+          ? "A quick map of the main actions students can take on LAR Connect."
+          : "A quick map of the main actions teachers can take on LAR Connect."}
+      </p>
+      <List items={steps.map((step, index) => ({ title: `${index + 1}. ${step.title}`, meta: step.meta, tone: index % 2 === 0 ? "bg-yellow" : "bg-peach", action: "Start" }))} />
     </div>
   );
 }
@@ -556,11 +591,15 @@ export function Dashboard({
 }) {
   const [view, setView] = useState<MenuKey>("dashboard");
   const [drawer, setDrawer] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   const isStudent = role === "student";
 
   const go = (k: MenuKey) => {
     setView(k);
     setDrawer(false);
+    window.setTimeout(() => {
+      contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
   };
 
   const content: Record<MenuKey, React.ReactNode> = {
@@ -642,6 +681,7 @@ export function Dashboard({
     language: <LanguagePanel />,
     tutor: <TutorPanel />,
     leaderboard: isStudent ? <StudentLeaderboard /> : <TeacherLeaderboard />,
+    guide: <UserGuidePanel isStudent={isStudent} />,
     offline: <OfflinePanel />,
     community: (
       <div className="space-y-3">
@@ -677,6 +717,9 @@ export function Dashboard({
           <p className="mt-1 font-bold break-words">{email}</p>
           <p className="font-mono text-xs uppercase">Role · {role}</p>
         </div>
+        <NBButton tone="white" full onClick={() => go("guide")}>
+          User Guide
+        </NBButton>
         <NBButton tone="white" full onClick={onSignOut}>
           Sign out
         </NBButton>
@@ -692,18 +735,22 @@ export function Dashboard({
           <p className="truncate font-display text-lg font-bold sm:text-xl">
             LAR<span className="ml-1 text-lavender">Connect</span>
           </p>
-          <nav className="hidden flex-wrap items-center justify-end gap-2 xl:flex">
-            {MENU.map((m) => (
-              <button
-                key={m.key}
-                onClick={() => go(m.key)}
-                className={`nb nb-press px-3 py-2 text-sm font-bold ${
-                  view === m.key ? "bg-lavender text-primary-foreground" : "bg-background"
-                }`}
-              >
-                {m.label}
-              </button>
-            ))}
+          <nav className="hidden xl:flex">
+            <div className="nb flex max-w-[min(100%,42rem)] items-center overflow-x-auto bg-background p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex flex-nowrap items-center gap-2 whitespace-nowrap">
+                {MENU.map((m) => (
+                  <button
+                    key={m.key}
+                    onClick={() => go(m.key)}
+                    className={`nb nb-press px-3 py-2 text-sm font-bold ${
+                      view === m.key ? "bg-lavender text-primary-foreground" : "bg-background"
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </nav>
           <button
             onClick={() => setDrawer(true)}
@@ -716,6 +763,14 @@ export function Dashboard({
 
       {/* page */}
       <main className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-5 sm:py-8">
+        {view !== "dashboard" && (
+          <button
+            onClick={() => go("dashboard")}
+            className="nb nb-press bg-background px-3 py-2 text-sm font-bold"
+          >
+            ← Back home
+          </button>
+        )}
         <div className="flex flex-wrap gap-3">
           <Badge tone="yellow">Bridging the Rural-Urban Education Gap</Badge>
           <Badge tone="peach">Empowering Teachers &amp; Students</Badge>
@@ -752,7 +807,9 @@ export function Dashboard({
           />
         </div>
 
-        <Section title={TITLES[view]}>{content[view]}</Section>
+        <div ref={contentRef} className="scroll-mt-24">
+          <Section title={TITLES[view]}>{content[view]}</Section>
+        </div>
       </main>
 
       {/* slide-out drawer */}
@@ -776,18 +833,20 @@ export function Dashboard({
                 ×
               </button>
             </div>
-            <div className="mt-5 space-y-3 pb-6">
-              {MENU.map((m) => (
-                <button
-                  key={m.key}
-                  onClick={() => go(m.key)}
-                  className={`nb nb-press w-full px-4 py-3 text-left font-bold ${
-                    view === m.key ? "bg-lavender text-primary-foreground" : "bg-background"
-                  }`}
-                >
-                  {m.label}
-                </button>
-              ))}
+            <div className="nb mt-5 bg-background p-3">
+              <div className="space-y-3 pb-2">
+                {MENU.map((m) => (
+                  <button
+                    key={m.key}
+                    onClick={() => go(m.key)}
+                    className={`nb nb-press w-full px-4 py-3 text-left font-bold ${
+                      view === m.key ? "bg-lavender text-primary-foreground" : "bg-background"
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </aside>
         </div>
