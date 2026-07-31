@@ -8,7 +8,9 @@ type MenuKey =
   | "resources"
   | "upload"
   | "credits"
+  | "language"
   | "tutor"
+  | "leaderboard"
   | "offline"
   | "community"
   | "impact"
@@ -21,7 +23,9 @@ const MENU: { key: MenuKey; label: string }[] = [
   { key: "resources", label: "Resources" },
   { key: "upload", label: "Upload Content" },
   { key: "credits", label: "LAR Credits" },
+  { key: "language", label: "Language" },
   { key: "tutor", label: "AI Tutor" },
+  { key: "leaderboard", label: "Leaderboard" },
   { key: "offline", label: "Offline Downloads" },
   { key: "community", label: "Community" },
   { key: "impact", label: "Impact" },
@@ -35,7 +39,9 @@ const TITLES: Record<MenuKey, string> = {
   resources: "Resource Library",
   upload: "Upload Content",
   credits: "LAR Credits",
+  language: "Language",
   tutor: "AI Tutor Session",
+  leaderboard: "Leaderboard",
   offline: "Offline Downloads",
   community: "Community Wall",
   impact: "Our Impact",
@@ -90,6 +96,126 @@ function List({ items }: { items: { title: string; meta: string; tone: string; a
         </li>
       ))}
     </ul>
+  );
+}
+
+function LanguagePanel() {
+  const [language, setLanguage] = useState("English");
+  const options = [
+    "English",
+    "Hindi",
+    "Malayalam",
+    "Tamil",
+    "Telugu",
+    "Kannada",
+    "Bengali",
+    "Marathi",
+    "Gujarati",
+    "Punjabi",
+    "Odia",
+    "Urdu",
+  ];
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-xl font-bold">Choose your language</h3>
+      <p className="text-sm text-muted-foreground">
+        Pick a language that feels familiar for your daily learning flow.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {options.map((option) => {
+          const isSelected = language === option;
+          return (
+            <button
+              key={option}
+              onClick={() => setLanguage(option)}
+              className={`nb nb-press px-4 py-3 text-left font-bold ${
+                isSelected ? "bg-lavender text-primary-foreground" : "bg-card"
+              }`}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+      <div className="nb bg-yellow p-4">
+        <p className="font-mono text-[10px] font-bold uppercase">Active language</p>
+        <p className="mt-1 font-bold">{language}</p>
+      </div>
+    </div>
+  );
+}
+
+function StudentLeaderboard() {
+  const students = [
+    { name: "Aarav Sharma", school: "Kochi Rural School", credits: 1480 },
+    { name: "Nisha Menon", school: "Thiruvananthapuram High School", credits: 1420 },
+    { name: "Rohan Bhat", school: "Mysuru Learning Centre", credits: 1385 },
+    { name: "Meera Iyer", school: "Bengaluru Model School", credits: 1330 },
+    { name: "Karthik Rao", school: "Vijayawada Community School", credits: 1280 },
+    { name: "Sana Khan", school: "Ahmedabad Girls Academy", credits: 1240 },
+    { name: "Dev Joshi", school: "Pune Tech School", credits: 1195 },
+    { name: "Ananya Das", school: "Kolkata Bridge School", credits: 1160 },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {students.map((student, index) => (
+        <div key={student.name} className="nb grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 bg-card p-4">
+          <div className="nb flex h-10 w-10 items-center justify-center bg-lavender font-bold text-primary-foreground">
+            {index + 1}
+          </div>
+          <div className="min-w-0">
+            <p className="font-bold">{student.name}</p>
+            <p className="font-mono text-xs uppercase">{student.school}</p>
+          </div>
+          <div className="text-right">
+            <p className="font-bold">{student.credits} pts</p>
+            <p className="font-mono text-[10px] uppercase">credits</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TeacherLeaderboard() {
+  const teachers = [
+    { name: "Mr. Joseph Peter", district: "Kottayam", score: 984 },
+    { name: "Ms. Rekha Nair", district: "Kozhikode", score: 952 },
+    { name: "Mr. Arjun Shah", district: "Surat", score: 931 },
+    { name: "Ms. Pooja Verma", district: "Jaipur", score: 894 },
+    { name: "Mr. Suresh Reddy", district: "Hyderabad", score: 876 },
+    { name: "Ms. Tanvi Bhosale", district: "Pune", score: 851 },
+    { name: "Mr. Aditya Chatterjee", district: "Kolkata", score: 833 },
+    { name: "Ms. Fatima Begum", district: "Lucknow", score: 809 },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {teachers.map((teacher, index) => {
+        const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : null;
+        const badgeTone = index === 0 ? "yellow" : index === 1 ? "white" : index === 2 ? "peach" : undefined;
+        return (
+          <div key={teacher.name} className="nb grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 bg-card p-4">
+            <div className="nb flex h-10 w-10 items-center justify-center bg-yellow font-bold">
+              {index + 1}
+            </div>
+            <div className="min-w-0">
+              <p className="font-bold">{teacher.name}</p>
+              <p className="font-mono text-xs uppercase">{teacher.district}</p>
+            </div>
+            <div className="flex items-center gap-2 text-right">
+              {medal && badgeTone ? <Badge tone={badgeTone}>{medal}</Badge> : null}
+              <div>
+                <p className="font-bold">{teacher.score} pts</p>
+                <p className="font-mono text-[10px] uppercase">impact</p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -435,7 +561,6 @@ export function Dashboard({
   const go = (k: MenuKey) => {
     setView(k);
     setDrawer(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const content: Record<MenuKey, React.ReactNode> = {
@@ -453,7 +578,7 @@ export function Dashboard({
             </div>
           ))}
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-3">
           <Tile
             tone="bg-peach"
             eyebrow="Credits"
@@ -467,6 +592,13 @@ export function Dashboard({
             title="AI Tutor"
             body="Online AI answers or offline RAG from your modules."
             onClick={() => go("tutor")}
+          />
+          <Tile
+            tone="bg-yellow"
+            eyebrow="Rankings"
+            title="Leaderboard"
+            body={isStudent ? "See top LAR credit earners" : "See top performing teachers"}
+            onClick={() => go("leaderboard")}
           />
         </div>
       </div>
@@ -507,7 +639,9 @@ export function Dashboard({
     ),
     upload: <UploadPanel isStudent={isStudent} />,
     credits: <CreditsPanel />,
+    language: <LanguagePanel />,
     tutor: <TutorPanel />,
+    leaderboard: isStudent ? <StudentLeaderboard /> : <TeacherLeaderboard />,
     offline: <OfflinePanel />,
     community: (
       <div className="space-y-3">
